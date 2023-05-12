@@ -71,7 +71,7 @@ body {
     right: 0;
     bottom: 0;
     background: #000000a1;
-    display: flex;
+    display: none;
     justify-content: center;
     align-items: center;
 }
@@ -79,13 +79,55 @@ body {
 .modal .modal-content {
     width: 400px;
     min-width: 300px;
-    min-height: 200px;
+    min-height: 100px;
     background: #373737;
     border-radius: 20px;
     padding: 20px;
-
+    position: relative;
 }
 
 .modal .modal-content h1 {
     margin: 0;
 }
+
+.modal .modal-content button.btn-close {
+    position: absolute;
+    top: 0px;
+    right: 10px;
+    font-size: 20px;
+    border: none;
+    background: none;
+    color: white;
+    padding: 10px;
+    cursor: pointer;
+}
+
+#add-stock form {
+    margin-top: 20px 0 0 0;
+}
+
+#tickersList {
+    display: flex;
+    gap: 30px;
+    padding: 20px;
+}
+
+#tickersList .ticker{
+    background: #262626;
+    padding: 20px;
+    border-radius: 20px;
+    width: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#tickersList .ticker h2 {
+    margin-top: 0;
+}
+
+#tickersList .ticker p {
+    margin: 0;
+}
+
