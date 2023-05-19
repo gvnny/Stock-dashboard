@@ -90,7 +90,7 @@ body {
     margin: 0;
 }
 
-.modal .modal-content button.btn-close {
+.modal .modal-content button.btn-close, #tickers-list .ticker button.btn-close  {
     position: absolute;
     top: 0px;
     right: 10px;
@@ -106,13 +106,13 @@ body {
     margin-top: 20px 0 0 0;
 }
 
-#tickersList {
+#tickers-list {
     display: flex;
     gap: 30px;
     padding: 20px;
 }
 
-#tickersList .ticker{
+#tickers-list .ticker{
     background: #262626;
     padding: 20px;
     border-radius: 20px;
@@ -121,13 +121,28 @@ body {
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
+    position: relative;
 }
 
-#tickersList .ticker h2 {
+#tickers-list .ticker h2 {
     margin-top: 0;
 }
 
-#tickersList .ticker p {
+#tickers-list .ticker p {
     margin: 0;
+}
+
+.ticker p.increase {
+    color: #10a710;
+}
+
+.ticker p.decrease {
+    color: #ae1f1f;
+}
+
+#tickers-list .ticker button.btn-close {
+    line-height: 14px;
+    right: 5px;
+    display: none;
 }
 

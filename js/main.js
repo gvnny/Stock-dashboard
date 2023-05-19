@@ -6,43 +6,106 @@ const openModal = (idModal) => {
 
 const closeModal = (idModal) => {
     const divModal = document.querySelector(idModal)
-    divModal.style.display = "none"
+    divModal.style.display = "none";
 }
 
 const handleModalClose = (event) => {
     if(event.target.className === "modal"){
-        event.target.style.display = "none"
+        event.target.style.display = "none";
     }
 }
 
-const handleAddTicker = async(event) => {
+const arrayListObjectTicker = [];
+
+const handleAddTicker = async (event) => {
     event.preventDefault();
     const ticker = event.target.ticker.value;
 
     try{
-        const response = await fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${ticker}&apikey=XXXXXXX`);
+        const response = await fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${ticker}&apikey=P736UCPWLNYXPCH5`);
         const data = await response.json();
-        if(data["Global Quote"]["05. price"]) {
+        const price = data["Global Quote"]["05. price"];
+        const priviousClosePrice = data["Global Quote"]["08. previous close"];
+
+        if(price && priviousClosePrice) {
+
+            const priceFormatted = parseFloat(price).toFixed(2);
+            const priviousClosePriceFormatted = parseFloat(priviousClosePrice).toFixed(2);
+            let priceChange = '';
+            let symbol = '';
+
+            if(priceFormatted !== priviousClosePriceFormatted) {
+
+                if(priceFormatted > priviousClosePriceFormatted) {
+                    priceChange = 'increase';
+                    symbol = '+';
+                } else {
+                    priceChange = 'decrease';
+                    symbol = '-';
+                }
+
+            }
+
             const newTicker = 
                                 `<div class="ticker">
+                                <button class="btn-close" onclick="removeTicker(event)">x</button>
                                     <h2>${ticker}</h2>
-                                    <p>${price}</p>
+                                    <p class="${priceChange}">${symbol} $${priceFormatted}</p>
                                 </div>`;
 
             const tickerList = document.querySelector("#tickers-list");
-            tickerList.innerHTML += newTicker;
+            tickerList.innerHTML = newTicker + tickerList.innerHTML;
+            addTickersCloseEvent();
             closeModal('#add-stock');
+
+            const objectTicker = {
+                name: ticker,
+                price: priceFormatted,
+                symbol,
+                priceChange
+            }
+
+            console.log(objectTicker);
+
+            arrayListObjectTicker.push(objectTicker);
+
         } else {
             alert(`Ticker ${ticker} não encontrado`);
         }
-    } catch {
-        alert(error)
+    } catch (error) {
+        alert(error);
     }
-    
-    
-
-
 }
 
-const modal = document.querySelector(".modal")
-modal.addEventListener("click", handleModalClose) // adiciona um evendo a classe modal
+const handleTickerMouseEnter = (event) => {
+
+    const ticker = event.target
+    const btnClose = ticker.querySelector(".btn-close");
+    btnClose.style.display = "block";
+}
+
+const addTickersCloseEvent = () => {
+    const ticker = document.querySelectorAll(".ticker");
+    ticker.forEach ((ticker) =>  {
+    ticker.addEventListener("mouseenter", handleTickerMouseEnter);
+    ticker.addEventListener("mouseleave", handleTickerMouseLeave);
+})
+}
+
+const handleTickerMouseLeave = (event) => {
+    const ticker = event.target
+    const btnClose = ticker.querySelector(".btn-close");
+    btnClose.style.display = "none";
+}
+
+const removeTicker = (event) => {
+    const btnClose = event.target // target mostra elemento foi clicado ou a ação expecifica;
+    const ticker = btnClose.closest(".ticker");
+    ticker.remove();
+}
+
+const modal = document.querySelector(".modal");
+modal.addEventListener("click", handleModalClose); // adiciona um evendo a classe modal
+
+addTickersCloseEvent();
+
