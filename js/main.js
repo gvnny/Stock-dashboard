@@ -17,64 +17,98 @@ const handleModalClose = (event) => {
 
 const arrayListObjectTicker = [];
 
+console.log('Array na inicialização: '+arrayListObjectTicker);
+
 const handleAddTicker = async (event) => {
     event.preventDefault();
     const ticker = event.target.ticker.value;
 
-    try{
-        const response = await fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${ticker}&apikey=P736UCPWLNYXPCH5`);
-        const data = await response.json();
-        const price = data["Global Quote"]["05. price"];
-        const priviousClosePrice = data["Global Quote"]["08. previous close"];
+    const verificaArray = () => {
 
-        if(price && priviousClosePrice) {
-
-            const priceFormatted = parseFloat(price).toFixed(2);
-            const priviousClosePriceFormatted = parseFloat(priviousClosePrice).toFixed(2);
-            let priceChange = '';
-            let symbol = '';
-
-            if(priceFormatted !== priviousClosePriceFormatted) {
-
-                if(priceFormatted > priviousClosePriceFormatted) {
-                    priceChange = 'increase';
-                    symbol = '+';
+        if(arrayListObjectTicker.length == 0) {
+            return 0;
+        } else if (arrayListObjectTicker.length != 0) {
+    
+            for(i=0; i <= arrayListObjectTicker.length; i++){
+                if (ticker === arrayListObjectTicker[i].ticker) {
+                    console.log(ticker);
+                    return 1;
+                    //
                 } else {
-                    priceChange = 'decrease';
-                    symbol = '-';
+                    console.log(ticker);
+                    return 2
                 }
-
             }
-
-            const newTicker = 
-                                `<div class="ticker">
-                                <button class="btn-close" onclick="removeTicker(event)">x</button>
-                                    <h2>${ticker}</h2>
-                                    <p class="${priceChange}">${symbol} $${priceFormatted}</p>
-                                </div>`;
-
-            const tickerList = document.querySelector("#tickers-list");
-            tickerList.innerHTML = newTicker + tickerList.innerHTML;
-            addTickersCloseEvent();
-            closeModal('#add-stock');
-
-            const objectTicker = {
-                name: ticker,
-                price: priceFormatted,
-                symbol,
-                priceChange
-            }
-
-            console.log(objectTicker);
-
-            arrayListObjectTicker.push(objectTicker);
-
-        } else {
-            alert(`Ticker ${ticker} não encontrado`);
         }
-    } catch (error) {
-        alert(error);
+    
+        // 0 -> Vetor Vazio
+        // 1 -> Ticker já existente no vetor
+        // 2 -> Ticker não existente no vetor
+        
+    } 
+
+    if (verificaArray() == 0 || verificaArray() == 2) {
+        console.log('Resultado do verifica valor: '+verificaArray());
+        try{
+            const response = await fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${ticker}&apikey=P736UCPWLNYXPCH5`);
+            const data = await response.json();
+            const price = data["Global Quote"]["05. price"];
+            const priviousClosePrice = data["Global Quote"]["08. previous close"];
+    
+            if(price && priviousClosePrice) {
+    
+                const priceFormatted = parseFloat(price).toFixed(2);
+                const priviousClosePriceFormatted = parseFloat(priviousClosePrice).toFixed(2);
+                let priceChange = '';
+                let symbol = '';
+    
+                if(priceFormatted !== priviousClosePriceFormatted) {
+    
+                    if(priceFormatted > priviousClosePriceFormatted) {
+                        priceChange = 'increase';
+                        symbol = '+';
+                    } else {
+                        priceChange = 'decrease';
+                        symbol = '-';
+                    }
+    
+                }
+    
+                const newTicker = 
+                                    `<div class="ticker">
+                                    <button class="btn-close" onclick="removeTicker(event)">x</button>
+                                        <h2>${ticker}</h2>
+                                        <p class="${priceChange}">${symbol} $${priceFormatted}</p>
+                                    </div>`;
+    
+                const tickerList = document.querySelector("#tickers-list");
+                tickerList.innerHTML = newTicker + tickerList.innerHTML;
+                addTickersCloseEvent();
+                closeModal('#add-stock');
+    
+                const objectTicker = {
+                    ticker,
+                    priceFormatted,
+                    symbol,
+                    priceChange
+                }
+    
+                console.log(objectTicker);
+    
+                arrayListObjectTicker.push(objectTicker);
+    
+                console.log(arrayListObjectTicker);
+    
+            } else {
+                alert(`Ticker ${ticker} não encontrado`);
+            }
+        } catch (error) {
+            alert(error);
+        }
+    } else {
+        alert(`O tiker ${ticker} já foi adicionado anterirmente`);
     }
+
 }
 
 const handleTickerMouseEnter = (event) => {
