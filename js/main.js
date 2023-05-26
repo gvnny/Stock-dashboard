@@ -50,7 +50,8 @@ const handleAddTicker = async (event) => {
     if (verificaArray() == 0 || verificaArray() == 2) {
         console.log('Resultado do verifica valor: '+verificaArray());
         try{
-            const response = await fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${ticker}&apikey=P736UCPWLNYXPCH5`);
+            const response = await fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${ticker}&apikey=XXXXXXXXXX`);
+            //P736UCPWLNYXPCH5
             const data = await response.json();
             const price = data["Global Quote"]["05. price"];
             const priviousClosePrice = data["Global Quote"]["08. previous close"];
@@ -111,12 +112,49 @@ const handleAddTicker = async (event) => {
 
 }
 
+const refreshTicker = async (event) => {
+    const divticker = event.target.closest('ticker');
+    const ticker = divticker.querySelector('h2').textContent
+    const pPrice = divticker.querySelector('p').textContent
+    const response = await fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${ticker}&apikey=XXXXXXXXXX`);
+            //P736UCPWLNYXPCH5
+            const data = await response.json();
+            const price = data["Global Quote"]["05. price"];
+            const priviousClosePrice = data["Global Quote"]["08. previous close"];
+    
+            if(price && priviousClosePrice) {
+    
+                const priceFormatted = parseFloat(price).toFixed(2);
+                const priviousClosePriceFormatted = parseFloat(priviousClosePrice).toFixed(2);
+                let priceChange = '';
+                let symbol = '';
+    
+                if(priceFormatted !== priviousClosePriceFormatted) {
+    
+                    if(priceFormatted > priviousClosePriceFormatted) {
+                        priceChange = 'increase';
+                        symbol = '+';
+                    } else {
+                        priceChange = 'decrease';
+                        symbol = '-';
+                    }
+    
+                }
+                pPrice.innerHTML = `${symbol} ${priceFormatted}`;
+                pPrice.className = priceChange;
+            }else {
+                alert(`Ticker ${ticker} não encontrado`);
+            }
+}
+
 const handleTickerMouseEnter = (event) => {
 
     const ticker = event.target
     const btnClose = ticker.querySelector(".btn-close");
     btnClose.style.display = "block";
+    btnRefresh.style.display = "block";
 }
+
 
 const addTickersCloseEvent = () => {
     const ticker = document.querySelectorAll(".ticker");
@@ -129,7 +167,9 @@ const addTickersCloseEvent = () => {
 const handleTickerMouseLeave = (event) => {
     const ticker = event.target
     const btnClose = ticker.querySelector(".btn-close");
+    const btnRefresh = ticker.querySelector(".btn-refresh");
     btnClose.style.display = "none";
+    btnRefresh.style.display = "none";
 }
 
 const removeTicker = (event) => {
